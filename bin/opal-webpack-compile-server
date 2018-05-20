@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'opal-webpack-compile-server/exe'
+require 'opal-webpack-compile-server/version'
+
+OpalWebpackCompileServer::Exe.run
