@@ -2,4 +2,10 @@
 require 'opal-webpack-compile-server/exe'
 require 'opal-webpack-compile-server/version'
 
-OpalWebpackCompileServer::Exe.run
+if ARGV[0] == 'kill'
+  puts "Killing OWL Compile Server"
+  OpalWebpackCompileServer::Exe.kill
+else
+  puts "Starting OWL Compile Server"
+  OpalWebpackCompileServer::Exe.run
+end
