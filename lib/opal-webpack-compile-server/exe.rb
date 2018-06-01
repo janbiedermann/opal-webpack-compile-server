@@ -77,7 +77,10 @@ module OpalWebpackCompileServer
 
         load_path_entries = []
 
+        cwd = Dir.pwd
+
         load_path_lines.each do |path|
+          next if path.start_with?(cwd)
           more_path_entries = get_load_path_entries(path)
           load_path_entries.push(*more_path_entries) if more_path_entries.size > 0
         end
