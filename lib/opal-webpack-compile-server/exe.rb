@@ -56,6 +56,7 @@ module OpalWebpackCompileServer
   class LoadPathManager
     def self.get_load_path_entries(path)
       path_entries = []
+      return [] unless Dir.exist?(path)
       dir_entries = Dir.entries(path)
       dir_entries.each do |entry|
         next if entry == '.'
