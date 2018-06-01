@@ -113,6 +113,7 @@ module OpalWebpackCompileServer
 
     def self.kill
       if File.exist?(OWCS_SOCKET_PATH)
+        puts 'Killing Opal Webpack Compile Server'
         dont_unlink_on_exit
         s = UNIXSocket.new(OWCS_SOCKET_PATH)
         s.send("command:kill\n", 0)
@@ -123,7 +124,7 @@ module OpalWebpackCompileServer
 
     def self.run
       if File.exist?(OWCS_SOCKET_PATH) # OWCS already running
-        puts "Another Compile Server already running, exiting"
+        puts 'Another Opal Webpack Compile Server already running, exiting'
         dont_unlink_on_exit
         exit(1)
       else
@@ -131,6 +132,7 @@ module OpalWebpackCompileServer
         load_paths = OpalWebpackCompileServer::LoadPathManager.get_load_paths
         if load_paths
           Opal.append_paths(*load_paths)
+          puts 'Starting Opal Webpack Compile Server'
           Process.daemon(true)
           EventMachine.run do
             EventMachine.start_unix_domain_server(OWCS_SOCKET_PATH, OpalWebpackCompileServer::Compiler)
