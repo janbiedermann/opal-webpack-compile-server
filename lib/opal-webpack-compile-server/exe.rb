@@ -7,7 +7,11 @@ require 'opal/compiler'
 require 'socket'
 
 at_exit do
-  File.unlink(OpalWebpackCompileServer::OWCS_SOCKET_PATH) if OpalWebpackCompileServer::Exe.unlink_socket?
+  if OpalWebpackCompileServer::Exe.unlink_socket?
+    if File.exist?(OpalWebpackCompileServer::OWCS_SOCKET_PATH)
+      File.unlink(OpalWebpackCompileServer::OWCS_SOCKET_PATH)
+    end
+  end
 end
 
 module OpalWebpackCompileServer
