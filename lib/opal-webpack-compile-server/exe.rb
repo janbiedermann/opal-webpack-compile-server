@@ -92,6 +92,7 @@ module OpalWebpackCompileServer
         cache_obj = { 'opal_load_paths' => load_path_lines, 'opal_load_path_entries' => load_path_entries }
         Dir.mkdir(OpalWebpackCompileServer::OWL_CACHE_DIR) unless Dir.exist?(OpalWebpackCompileServer::OWL_CACHE_DIR)
         File.write(OpalWebpackCompileServer::OWL_LP_CACHE, Oj.dump(cache_obj))
+        load_path_lines
       else
         puts 'Error getting load paths!'
         exit(2)
