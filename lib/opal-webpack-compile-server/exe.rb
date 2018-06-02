@@ -34,9 +34,10 @@ module OpalWebpackCompileServer
           c = Opal::Compiler.new(source, file: filename, es_six_imexable: true)
           c.compile
           result = { 'javascript' => c.result }
-          result['source_map'] = c.source_map(filename).as_json
+          result['source_map'] = c.source_map.as_json
           result['source_map']['sourcesContent'] = [source]
           result['source_map']['file'] = filename
+          result['source_map']['names'] = result['source_map']['names'].map(&:to_s)
           result['required_trees'] = c.required_trees
           Oj.dump(result)
         rescue Exception => e
@@ -115,7 +116,6 @@ module OpalWebpackCompileServer
 
     def self.kill
       if File.exist?(OWCS_SOCKET_PATH)
-        puts 'Killing Opal Webpack Compile Server'
         dont_unlink_on_exit
         s = UNIXSocket.new(OWCS_SOCKET_PATH)
         s.send("command:kill\n", 0)
@@ -134,7 +134,6 @@ module OpalWebpackCompileServer
         load_paths = OpalWebpackCompileServer::LoadPathManager.get_load_paths
         if load_paths
           Opal.append_paths(*load_paths)
-          puts 'Starting Opal Webpack Compile Server'
           Process.daemon(true)
           EventMachine.run do
             EventMachine.start_unix_domain_server(OWCS_SOCKET_PATH, OpalWebpackCompileServer::Compiler)
