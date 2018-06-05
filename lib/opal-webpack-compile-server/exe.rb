@@ -117,9 +117,14 @@ module OpalWebpackCompileServer
     def self.kill
       if File.exist?(OWCS_SOCKET_PATH)
         dont_unlink_on_exit
-        s = UNIXSocket.new(OWCS_SOCKET_PATH)
-        s.send("command:kill\n", 0)
-        s.close
+        begin
+          s = UNIXSocket.new(OWCS_SOCKET_PATH)
+          s.send("command:kill\n", 0)
+          s.close
+        rescue
+          # socket cant be reached so owcs is already dead, delete socket
+          unlink_on_exit
+        end
         exit(0)
       end
     end
