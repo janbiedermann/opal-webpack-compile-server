@@ -74,9 +74,15 @@ module OpalWebpackCompileServer
     end
 
     def self.get_load_paths
-      load_paths = %x{
-        bundle exec rails runner "puts (Rails.configuration.respond_to?(:assets) ? (Rails.configuration.assets.paths + Opal.paths).uniq : Opal.paths)"
-      }
+      load_paths = if File.exist?('bin/rails')
+                     %x{
+                       bundle exec rails runner "puts (Rails.configuration.respond_to?(:assets) ? (Rails.configuration.assets.paths + Opal.paths).uniq : Opal.paths)"
+                     }
+                   else
+                     %x{
+                       bundle exec ruby -e 'require "bundler/setup"; Bundler.require; puts Opal.paths'
+                     }
+                   end
       if $? == 0
         load_path_lines = load_paths.split("\n")
         load_path_lines.pop if load_path_lines.last == ''
@@ -95,7 +101,7 @@ module OpalWebpackCompileServer
         File.write(OpalWebpackCompileServer::OWL_LP_CACHE, Oj.dump(cache_obj))
         load_path_lines
       else
-        puts 'Error getting load paths!'
+        raise 'Error getting load paths!'
         exit(2)
       end
     end
