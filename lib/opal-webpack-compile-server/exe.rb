@@ -21,7 +21,7 @@ module OpalWebpackCompileServer
 
   class Compiler < EventMachine::Connection
     def receive_data(data)
-      if data.start_with?('command:kill')
+      if data.start_with?('command:stop')
         EventMachine.stop
         exit(0)
       end
@@ -31,7 +31,7 @@ module OpalWebpackCompileServer
       operation = proc do
         begin
           source = File.read(filename)
-          c = Opal::Compiler.new(source, file: filename, es_six_imexable: true)
+          c = Opal::Compiler.new(source, file: filename, es6_modules: true)
           c.compile
           result = { 'javascript' => c.result }
           result['source_map'] = c.source_map.as_json
@@ -120,12 +120,12 @@ module OpalWebpackCompileServer
       @unlink = false
     end
 
-    def self.kill
+    def self.stop
       if File.exist?(OWCS_SOCKET_PATH)
         dont_unlink_on_exit
         begin
           s = UNIXSocket.new(OWCS_SOCKET_PATH)
-          s.send("command:kill\n", 0)
+          s.send("command:stop\n", 0)
           s.close
         rescue
           # socket cant be reached so owcs is already dead, delete socket
@@ -154,36 +154,3 @@ module OpalWebpackCompileServer
     end
   end
 end
-
-# js
-#
-# get_load_paths() {
-#   var load_paths;
-#   if (fs.existsSync('bin/rails')) {
-#     load_paths = child_process.execSync('bundle exec rails runner ' +
-#                                           '"puts (Rails.configuration.respond_to?(:assets) ? ' +
-#                                           '(Rails.configuration.assets.paths + Opal.paths).uniq : ' +
-#                                           'Opal.paths); exit 0"');
-#   } else {
-#     load_paths = child_process.execSync('bundle exec ruby -e "Bundler.require; puts Opal.paths; exit 0"');
-#   }
-#   var load_path_lines = load_paths.toString().split('\n');
-#   var lp_length = load_path_lines.length;
-#   if (load_path_lines[lp_length-1] === '' || load_path_lines[lp_length-1] == null) {
-#     load_path_lines.pop();
-#   }
-#   return load_path_lines;
-#   }
-#
-#   get_load_path_entries(load_paths) {
-#     var load_path_entries = [];
-#     var lp_length = load_paths.length;
-#     for (var i = 0; i < lp_length; i++) {
-#       var dir_entries = this.get_directory_entries(load_paths[i], false);
-#     var d_length = dir_entries.length;
-#     for (var k = 0; k < d_length; k++) {
-#       load_path_entries.push(dir_entries[k]);
-#     }
-#     }
-#     return load_path_entries;
-#     }

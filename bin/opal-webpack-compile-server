@@ -2,8 +2,8 @@
 require 'opal-webpack-compile-server/exe'
 require 'opal-webpack-compile-server/version'
 
-if ARGV[0] == 'kill'
-  OpalWebpackCompileServer::Exe.kill
+if ARGV[0] == 'stop' || ARGV[0] == 'kill'
+  OpalWebpackCompileServer::Exe.stop
 else
   OpalWebpackCompileServer::Exe.run
 end
